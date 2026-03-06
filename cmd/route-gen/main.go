@@ -43,6 +43,7 @@ func loadConfig() (Config, error) {
 	if err != nil {
 		return Config{}, ErrConfFormat
 	}
+
 	return cfg, nil
 }
 
