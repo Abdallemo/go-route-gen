@@ -63,9 +63,10 @@ func main() {
 	var watchMode bool
 
 	rootCmd := &cobra.Command{
-		Use:   "route-gen",
-		Short: "Scrapes Go backend handlers to generate TypeScript API routes",
-		Long:  "A CLI tool that parses Go abstract syntax trees (AST) in the backend handlers directory to extract defined HTTP routes, then auto-generates a corresponding TypeScript constants file for the frontend.",
+		Use:     "route-gen",
+		Version: "1.0.2",
+		Short:   "Scrapes Go backend handlers to generate TypeScript API routes",
+		Long:    "A CLI tool that parses Go abstract syntax trees (AST) in the backend handlers directory to extract defined HTTP routes, then auto-generates a corresponding TypeScript constants file for the frontend.",
 		Run: func(cmd *cobra.Command, args []string) {
 			if handlerDir == "" || outputPath == "" {
 				log.Fatalf("\033[1;31m  ✘ Missing configuration:\033[0m You must provide --dir and --out flags, or create a routegen.json file.")
