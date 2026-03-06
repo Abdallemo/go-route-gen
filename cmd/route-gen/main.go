@@ -66,6 +66,7 @@ func main() {
 				if err != nil {
 					log.Fatalf("\033[1;31m  ✘ Load Config failed:\033[0m %v\n", err)
 				}
+
 				handlerDir = cfg.HandlersDir
 				outputPath = cfg.OutPath
 
