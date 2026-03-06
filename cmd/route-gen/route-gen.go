@@ -161,6 +161,13 @@ func getSortedKeys(r map[string]string) []string {
 	for k := range r {
 		keys = append(keys, k)
 	}
+	methodOrder := map[string]int{
+		"GET":    1,
+		"POST":   2,
+		"PATCH":  3,
+		"PUT":    4,
+		"DELETE": 5,
+	}
 
 	sort.Slice(keys, func(i, j int) bool {
 		valI := r[keys[i]]
@@ -173,7 +180,7 @@ func getSortedKeys(r map[string]string) []string {
 			return partsI[1] < partsJ[1]
 		}
 
-		return partsI[0] < partsJ[0]
+		return methodOrder[partsI[0]] < methodOrder[partsJ[0]]
 	})
 
 	return keys
