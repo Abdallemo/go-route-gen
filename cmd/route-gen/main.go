@@ -55,7 +55,7 @@ func main() {
 
 	rootCmd := &cobra.Command{
 		Use:     "route-gen",
-		Version: "1.0.2",
+		Version: "1.0.1",
 		Short:   "Scrapes Go backend handlers to generate TypeScript API routes",
 		Long:    "A CLI tool that parses Go abstract syntax trees (AST) in the backend handlers directory to extract defined HTTP routes, then auto-generates a corresponding TypeScript constants file for the frontend.",
 		Run: func(cmd *cobra.Command, args []string) {
