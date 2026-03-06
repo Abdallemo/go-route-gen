@@ -1,0 +1,38 @@
+{
+  "name": "@abdallemo/routegen-client",
+  "version": "1.0.0",
+  "description": "A fully type-safe API client for go-route-gen",
+  "keywords": [
+    "route-gen",
+    "go",
+    "typescript",
+    "api",
+    "client",
+    "axios"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Abdallemo/go-route-gen.git",
+    "directory": "packages/client"
+  },
+  "license": "MIT",
+  "author": "Abdalle",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "prepare": "npm run build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "peerDependencies": {
+    "axios": "^1.0.0"
+  },
+  "devDependencies": {
+    "axios": "^1.6.0",
+    "typescript": "^5.0.0"
+  }
+}
