@@ -21,7 +21,7 @@ go install github.com/Abdallemo/go-route-gen/cmd/route-gen@latest
 ### 2. Install the Frontend Client
 
 ```bash
-npm install @abdallemo/routegen-client axios
+npm install @abdallemo/routegen-client
 
 ```
 
