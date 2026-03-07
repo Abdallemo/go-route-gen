@@ -170,17 +170,20 @@ func getSortedKeys(r map[string]string) []string {
 	}
 
 	sort.Slice(keys, func(i, j int) bool {
-		valI := r[keys[i]]
-		valJ := r[keys[j]]
+		keyI, keyJ := keys[i], keys[j]
+		valI, valJ := r[keyI], r[keyJ]
 
-		partsI := strings.Fields(valI)
-		partsJ := strings.Fields(valJ)
+		pathI := strings.Fields(valI)[1]
+		pathJ := strings.Fields(valJ)[1]
 
-		if partsI[1] != partsJ[1] {
-			return partsI[1] < partsJ[1]
+		if pathI != pathJ {
+			return pathI < pathJ
 		}
 
-		return methodOrder[partsI[0]] < methodOrder[partsJ[0]]
+		methodI := strings.Split(keyI, "_")[0]
+		methodJ := strings.Split(keyJ, "_")[0]
+
+		return methodOrder[methodI] < methodOrder[methodJ]
 	})
 
 	return keys
