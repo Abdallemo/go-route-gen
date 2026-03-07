@@ -151,8 +151,12 @@ func writeTSFile(outputPath string, routes map[string]string) error {
 	return os.WriteFile(outputPath, []byte(sb.String()), 0644)
 }
 
-func sortMap(r map[string]string) {
-
+var methodOrder = map[string]int{
+	"GET":    1,
+	"POST":   2,
+	"PATCH":  3,
+	"PUT":    4,
+	"DELETE": 5,
 }
 
 func getSortedKeys(r map[string]string) []string {
@@ -161,27 +165,24 @@ func getSortedKeys(r map[string]string) []string {
 	for k := range r {
 		keys = append(keys, k)
 	}
-	methodOrder := map[string]int{
-		"GET":    1,
-		"POST":   2,
-		"PATCH":  3,
-		"PUT":    4,
-		"DELETE": 5,
-	}
 
 	sort.Slice(keys, func(i, j int) bool {
-		keyI, keyJ := keys[i], keys[j]
-		valI, valJ := r[keyI], r[keyJ]
 
-		pathI := strings.Fields(valI)[1]
-		pathJ := strings.Fields(valJ)[1]
+		valI, valJ := r[keys[i]], r[keys[j]]
+
+		partsI := strings.Fields(valI)
+		partsJ := strings.Fields(valJ)
+
+		pathI := partsI[1]
+		pathJ := partsJ[1]
 
 		if pathI != pathJ {
+
 			return pathI < pathJ
 		}
 
-		methodI := strings.Split(keyI, "_")[0]
-		methodJ := strings.Split(keyJ, "_")[0]
+		methodI := strings.Split(keys[i], "_")[0]
+		methodJ := strings.Split(keys[j], "_")[0]
 
 		return methodOrder[methodI] < methodOrder[methodJ]
 	})
