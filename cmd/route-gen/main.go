@@ -52,7 +52,6 @@ func main() {
 	var handlerDir string
 	var outputPath string
 	var watchMode bool
-	fmt.Println("local")
 
 	rootCmd := &cobra.Command{
 		Use:     "route-gen",
