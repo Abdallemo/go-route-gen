@@ -1,4 +1,5 @@
 import axios, { isAxiosError, } from "axios";
+export { HttpStatus } from "./types.js";
 export class GoApiClient {
     axiosInstance;
     constructor(config) {

@@ -1,4 +1,6 @@
 import { type AxiosInstance, type AxiosRequestConfig } from "axios";
+export { type HttpStatusCode } from "./types.js";
+export { HttpStatus } from "./types.js";
 export type ApiResponse<T = any> = {
     data: T | null;
     error: string | null;
