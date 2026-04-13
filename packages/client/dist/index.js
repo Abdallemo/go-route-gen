@@ -1,8 +1,12 @@
 import axios, { isAxiosError, } from "axios";
+export * from "axios";
 export { HttpStatus } from "./types.js";
 export class GoApiClient {
     axiosInstance;
+    hooks;
+    config;
     constructor(config) {
+        this.config = config.config || {};
         this.axiosInstance =
             config.axiosInstance ||
                 axios.create({
@@ -11,7 +15,9 @@ export class GoApiClient {
                     headers: {
                         "Content-Type": "application/json",
                     },
+                    timeout: this.config.timeout || 15000,
                 });
+        this.hooks = config.hooks || {};
     }
     async _request(endpoint, config = {}) {
         try {
@@ -32,7 +38,27 @@ export class GoApiClient {
         catch (error) {
             if (isAxiosError(error)) {
                 const status = error.response?.status || 0;
-                const serverMsg = error.response?.data?.message || error.message;
+                let serverMsg = error.message;
+                const data = error.response?.data;
+                if (status === 401 && this.hooks.onUnauthorized) {
+                    this.hooks.onUnauthorized();
+                }
+                if (data && typeof data === "object" && "message" in data) {
+                    serverMsg = data.message;
+                }
+                else if (data instanceof Blob) {
+                    try {
+                        const text = await data.text();
+                        const parsed = JSON.parse(text);
+                        serverMsg = parsed.message || text;
+                    }
+                    catch {
+                        serverMsg = error.message;
+                    }
+                }
+                if (this.hooks.onError && status !== 401 && status !== 0) {
+                    this.hooks.onError(serverMsg, status);
+                }
                 return {
                     data: null,
                     error: serverMsg,

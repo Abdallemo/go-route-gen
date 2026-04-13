@@ -1,6 +1,6 @@
 import { type AxiosInstance, type AxiosRequestConfig } from "axios";
-export { type HttpStatusCode } from "./types.js";
-export { HttpStatus } from "./types.js";
+export * from "axios";
+export { HttpStatus, type HttpStatusCode } from "./types.js";
 export type ApiResponse<T = any> = {
     data: T | null;
     error: string | null;
@@ -17,9 +17,18 @@ export type ValidRoute<TRouteMap, TStrict extends boolean> = TStrict extends tru
 export interface GoApiClientConfig {
     baseURL: string;
     axiosInstance?: AxiosInstance;
+    config?: {
+        timeout?: number;
+    };
+    hooks?: {
+        onUnauthorized?: () => Promise<void> | void;
+        onError?: (message: string, status: number) => void;
+    };
 }
 export declare class GoApiClient<TRouteMap extends Record<string, string> = Record<string, string>, TStrict extends boolean = true> {
     private axiosInstance;
+    private hooks;
+    private config;
     constructor(config: GoApiClientConfig);
     private _request;
     request<R extends ValidRoute<TRouteMap, TStrict>>(route: R, ...args: RequestArgs<R>): Promise<ApiResponse<any>>;
