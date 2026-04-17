@@ -38,37 +38,25 @@ export class GoApiClient {
         catch (error) {
             if (isAxiosError(error)) {
                 const status = error.response?.status || 0;
-                let serverMsg = error.message;
-                const data = error.response?.data;
                 if (status === 401 && this.hooks.onUnauthorized) {
                     this.hooks.onUnauthorized();
                 }
-                if (data && typeof data === "object" && "message" in data) {
-                    serverMsg = data.message;
-                }
-                else if (data instanceof Blob) {
-                    try {
-                        const text = await data.text();
-                        const parsed = JSON.parse(text);
-                        serverMsg = parsed.message || text;
-                    }
-                    catch {
-                        serverMsg = error.message;
-                    }
-                }
+                const errObj = (error.response?.data ?? {
+                    message: error.message,
+                });
                 if (this.hooks.onError && status !== 401 && status !== 0) {
-                    this.hooks.onError(serverMsg, status);
+                    this.hooks.onError(errObj, status);
                 }
                 return {
                     data: null,
-                    error: serverMsg,
-                    status: status,
+                    error: errObj,
+                    status,
                 };
             }
-            console.error(error);
+            const fallback = { message: "Network error" };
             return {
                 data: null,
-                error: error instanceof Error ? error.message : "Network error",
+                error: fallback,
                 status: 0,
             };
         }
