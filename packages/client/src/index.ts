@@ -6,9 +6,9 @@ import axios, {
 
 export * from "axios";
 export { HttpStatus, type HttpStatusCode } from "./types.js";
-export type ApiResponse<T = any> = {
+export type ApiResponse<T = any, E = unknown> = {
   data: T | null;
-  error: string | null;
+  error: E | null;
   status: number;
 };
 
@@ -33,7 +33,7 @@ export type ValidRoute<
   ? TRouteMap[keyof TRouteMap] & string
   : (TRouteMap[keyof TRouteMap] & string) | (string & {});
 
-export interface GoApiClientConfig {
+export interface GoApiClientConfig<E = any> {
   baseURL: string;
   axiosInstance?: AxiosInstance;
   config?: {
@@ -41,19 +41,20 @@ export interface GoApiClientConfig {
   };
   hooks?: {
     onUnauthorized?: () => Promise<void> | void;
-    onError?: (message: string, status: number) => void;
+    onError?: (error: E, status: number) => void;
   };
 }
 
 export class GoApiClient<
   TRouteMap extends Record<string, string> = Record<string, string>,
   TStrict extends boolean = true,
+  E = { message: string },
 > {
   private axiosInstance: AxiosInstance;
-  private hooks: NonNullable<GoApiClientConfig["hooks"]>;
+  private hooks: NonNullable<GoApiClientConfig<E>["hooks"]>;
   private config: NonNullable<GoApiClientConfig["config"]>;
 
-  constructor(config: GoApiClientConfig) {
+  constructor(config: GoApiClientConfig<E>) {
     this.config = config.config || {};
 
     this.axiosInstance =
@@ -72,7 +73,7 @@ export class GoApiClient<
   private async _request<T>(
     endpoint: string,
     config: AxiosRequestConfig = {},
-  ): Promise<ApiResponse<T>> {
+  ): Promise<ApiResponse<T, E>> {
     try {
       const parts = endpoint.split(" ");
       const actualPath = parts.length === 2 ? parts[1] : parts[0];
@@ -92,37 +93,31 @@ export class GoApiClient<
     } catch (error) {
       if (isAxiosError(error)) {
         const status = error.response?.status || 0;
-        let serverMsg = error.message;
-        const data = error.response?.data;
 
         if (status === 401 && this.hooks.onUnauthorized) {
           this.hooks.onUnauthorized();
         }
 
-        if (data && typeof data === "object" && "message" in data) {
-          serverMsg = data.message;
-        } else if (data instanceof Blob) {
-          try {
-            const text = await data.text();
-            const parsed = JSON.parse(text);
-            serverMsg = parsed.message || text;
-          } catch {
-            serverMsg = error.message;
-          }
-        }
+        const errObj = (error.response?.data ?? {
+          message: error.message,
+        }) as E;
+
         if (this.hooks.onError && status !== 401 && status !== 0) {
-          this.hooks.onError(serverMsg, status);
+          this.hooks.onError(errObj, status);
         }
+
         return {
           data: null,
-          error: serverMsg,
-          status: status,
+          error: errObj,
+          status,
         };
       }
-      console.error(error);
+
+      const fallback = { message: "Network error" } as E;
+
       return {
         data: null,
-        error: error instanceof Error ? error.message : "Network error",
+        error: fallback,
         status: 0,
       };
     }
@@ -131,7 +126,7 @@ export class GoApiClient<
   async request<R extends ValidRoute<TRouteMap, TStrict>>(
     route: R,
     ...args: RequestArgs<R>
-  ): Promise<ApiResponse<any>> {
+  ): Promise<ApiResponse<any, E>> {
     let finalPath = route as string;
     let config: AxiosRequestConfig = {};
 
@@ -155,8 +150,8 @@ export class GoApiClient<
       request: async <R extends ValidRoute<TRouteMap, TStrict>>(
         route: R,
         ...args: RequestArgs<R>
-      ): Promise<ApiResponse<T>> => {
-        return this.request(route, ...args) as Promise<ApiResponse<T>>;
+      ): Promise<ApiResponse<T, E>> => {
+        return this.request(route, ...args) as Promise<ApiResponse<T, E>>;
       },
     };
   }

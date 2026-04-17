@@ -11,6 +11,7 @@ Get tRPC-style type safety across the network boundary without switching to a he
   * **Strict Route Matching**: TypeScript won't let you request a route that doesn't exist in your backend.
   * **Path Parameter Validation**: Automatically detects `{id}` segments in your Go routes and requires them as typed arguments in the frontend.
   * **Global Lifecycle Hooks**: Centralized `onError` and `onUnauthorized` handling.
+  * **Custom Error Types**: Define and receive structured error responses with generic type support.
   * **Lightweight**: A thin, powerful wrapper around Axios.
   * **Framework Agnostic**: Works with React, Vue, Svelte, or vanilla TS.
 
